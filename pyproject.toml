@@ -1,0 +1,91 @@
+[project]
+name = "enkoa-practice-advanced-agent"
+version = "0.1.0"
+description = "엔코아 AI캠퍼스 고급 RAG·에이전트 실습자료"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "jupyterlab>=4.6.2",
+    "pandas>=2.3,<3",
+    "numpy>=2.3,<2.5",
+    "python-dotenv>=1.0",
+    # day46: 청킹 전략·RAPTOR
+    #   LangChain 쪽은 Document·분할기·Chroma·OpenAI 모델을 쓴다.
+    #   ParentDocumentRetriever 는 현재 langchain_classic 에 있다.
+    "langchain>=1.3.13",
+    "langchain-core>=1.6.5,<2",
+    "langchain-classic>=1.0.8",
+    "langchain-community>=0.4",
+    "langchain-openai>=1.3.5",
+    "langchain-chroma>=1.1",
+    "langchain-text-splitters>=1.1",
+    # day54의 배포 Chroma DB를 만든 버전을 유지한다.
+    "chromadb==1.5.9",
+    #   PyPDFLoader 가 실제 PDF 를 읽는다(langchain-community 는 pypdf 를 필수로 걸지 않는다).
+    "pypdf>=6.0",
+    #   Semantic·Sentence Window·Auto-merging 은 LlamaIndex 공식 파서를 쓴다.
+    #   Auto-merging 은 잎 노드를 Chroma 에 넣는다(llama_index.vector_stores.chroma).
+    #   세 패키지는 버전 조합이 맞아야 LangchainEmbedding·ChromaVectorStore 연결이 동작해 고정한다.
+    "llama-index-core==0.14.24",
+    "llama-index-embeddings-langchain==0.6.0",
+    "llama-index-vector-stores-chroma==0.6.0",
+    #   RAPTOR 의 군집화(KMeans)와 벡터 정규화.
+    "scikit-learn>=1.5",
+    # day47: 하이브리드 검색·질의 변환
+    #   BM25 토큰화는 Kiwi 형태소 분석이다. 버전이 바뀌면 토큰이 달라져 교안의 BM25 수치가 흔들려 고정한다.
+    "kiwipiepy==0.23.2",
+    #   아래 둘은 노트북에 import 가 없지만 실행 중에 불린다. 빠지면 그 셀에서 ImportError 가 난다.
+    #   BM25Retriever → rank_bm25, SelfQueryRetriever 의 조건 파서 → lark.
+    "rank-bm25>=0.2.2",
+    "lark>=1.3",
+    #   Self-Query·질의 분해의 구조화 출력 스키마(BaseModel·Field)를 직접 import 한다.
+    "pydantic>=2.13",
+    #   교안 03 의 Jev(Noul·Choice·Score) 공식 SDK. 교안이 이 버전 API 로 쓰였다.
+    "typesafe-sdk==0.7.1",
+    # day48: 리랭킹·컨텍스트 압축
+    #   Cross-Encoder 리랭커(Qwen3-Reranker-0.6B)는 HuggingFaceCrossEncoder 가 sentence-transformers 로 돌린다.
+    #   ColBERT 비교는 FlagEmbedding 의 BGEM3FlagModel 을 쓴다. 두 모델 가중치는 huggingface_hub 로 미리 받는다.
+    #   교안이 이 조합으로 점수·순위를 확인했으므로 버전을 고정한다.
+    "sentence-transformers==6.1.0",
+    "transformers==5.17.0",
+    "torch==2.14.0",
+    "FlagEmbedding==1.4.2",
+    "huggingface-hub>=1.0",
+    # day49: Graph·Vector 하이브리드 검색과 Jev 언어 판단
+    "neo4j==6.2.0",
+    "neo4j-graphrag==1.18.0",
+    "langchain-neo4j==0.10.0",
+    "langchain-typesafe==0.0.1a3",
+    # day50: State·노드·조건부 엣지와 메시지 리듀서
+    "langgraph>=1,<2",
+    "typing-extensions>=4.15",
+    # day51: SQLite 체크포인터와 여행 정보 HTTP 조회
+    "langgraph-checkpoint-sqlite==3.1.1",
+    "requests>=2.32,<3",
+    # day52: Mem0 기억 관리·Qdrant 저장소·노트북 위젯
+    "mem0ai[nlp]==2.2.1",
+    # Mem0의 extras는 langchain-core<1을 요구한다. BM25 의존성만 개별 설치한다.
+    "fastembed==0.8.0",
+    # spaCy 모델도 uv로 설치해 첫 실행 시 pip를 통한 자동 다운로드를 피한다.
+    "en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl",
+    "qdrant-client==1.18.0",
+    "sqlite-vec==0.1.9",
+    "ipywidgets>=8,<9",
+    # day54: 노트북에서 Image·Markdown·display를 직접 사용한다.
+    "ipython>=9.17.1,<10",
+    # day55: 멀티에이전트 협업. 종합실습은 MCP 서버의 도구를 에이전트에 붙이고,
+    #   정답 폴더의 테스트는 pytest 와 pytest-asyncio 로 노드를 확인한다.
+    #   MCP 서버 자체는 npx·uvx 로 따로 띄우므로 여기에는 클라이언트 쪽만 둔다.
+    "langchain-mcp-adapters==0.3.2",
+    "mcp>=1.30,<2",
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+    # day56: Langfuse 로 에이전트 실행을 기록한다. CallbackHandler 와 trace 조회 방식이
+    #   이 버전 API 로 쓰였으므로 고정한다.
+    "langfuse==4.14.0",
+]
+
+[tool.uv]
+# Windows 수업 PC에서 wheel 전용 패키지도 설치할 수 있도록 해석한다.
+required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]
