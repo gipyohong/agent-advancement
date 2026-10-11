@@ -1,4 +1,4 @@
-# 종합실습02: 콘텐츠 생성 팀 (동적 계획 · 병렬 조사 · 핸드오프)
+# 콘텐츠 생성 팀 (동적 계획 · 병렬 조사 · 핸드오프)
 
 종합실습01 분석 팀이 쓴 보고서(`data/analysis_report.md`)를 받아, 다음 달 **블로그 글 1편과 쇼츠 대본 1편**을 만드는 팀입니다.
 계획 담당이 조사 작업을 몇 개로 나눌지 정하고, 작업마다 조사원(subagent)을 띄워 동시에 조사한 뒤 종합합니다.
@@ -123,26 +123,4 @@ app/
 
 <img src="images/rules.png" width="900" alt="supervisor는 돌려보낸 횟수 상한, 반려나 추가 조사 요청, 첫 초안 전 보충 조사 필요 여부, 그 밖 순서로 다음 단계를 정한다">
 
-## TODO 정리
 
-의존성이 적은 것부터(도구 -> 에이전트 -> 라우팅 함수 -> 노드 -> 그래프 조립) 파일별로 채웁니다. 코드의 `# TODO:` 아래 단계 주석을 따라 작성합니다. 중간에 실행하면 아직 비어 있는 TODO 에서 `NotImplementedError` 로 멈추므로, 멈춘 위치로 남은 일을 확인할 수 있습니다.
-
-- [v] 실행 준비 : Node.js 22 이상, `uv sync`, `.env` 키 채우기
-- [v] graph/state.py 구현 : 병렬 조사 결과 합치기
-    - [v] merge_findings : 조사 결과를 task_id 기준으로 합치는 리듀서 `[교안 02 4-2 dict 병합 리듀서]`
-- [v] tools/handoff.py 구현 : 작성자의 핸드오프 도구
-    - [v] request_review : Command.PARENT 로 바깥 그래프의 reviewer 에게 넘기기 (request_research 는 제공) `[교안 02 6-1 핸드오프와 Command.PARENT, 6-2 핸드오프 도구]`
-- [v] agents/workers.py 구현 : 작성자 에이전트
-    - [v] create_writer : 파일 쓰기 도구와 핸드오프 도구 두 개만 가진 작성자 에이전트 `[교안 01 5-2 워커 에이전트 / 교안 02 6-2 parallel_tool_calls]`
-- [v] graph/edges.py 구현 : 병렬 조사 분배
-    - [v] dispatch : 계획의 작업 수만큼 researcher 로 가는 Send 목록 `[교안 02 3-1 Send의 모양]`
-- [ ] graph/nodes.py 구현 : 조사와 판단 노드
-    - [ ] researcher : 그 작업의 자료원 도구만 붙인 subagent 를 만들어 실행 `[교안 02 5-4 조사 노드 / 교안 01 5-1 담당별 도구]`
-    - [ ] supervisor (1) 횟수 상한과 반려 : 돌려보낸 횟수(round) 상한 확인, 반려면 ReworkStep 으로 다음 담당과 지시문 `[교안 02 6-4 검수 결과에 따라 다시 돌기, 6-5 supervisor / 교안 01 5-7 처리 상한]`
-    - [ ] supervisor (2) 보충 조사 판단 : 반려가 없으면 브리프의 gaps 를 더 조사해야 할 Jev 확률로 planner(한 번만) 또는 writer `[교안 02 6-5 supervisor]`
-    - [ ] reviewer : Jev 점수로 통과·반려를 정해 Command(goto) 로 보내기 `[교안 02 6-3 검수 노드]`
-- [ ] graph/builder.py 구현 : 그래프 조립
-    - [ ] build_graph : 노드 등록, 고정 엣지와 Send 분배 엣지 연결, compile `[교안 02 3-5 Send 연결, 6-7 팀 그래프 연결]`
-- [ ] 실행 확인 : `uv run -m app.main "요청"` 으로 blog.md, shorts_script.md, sources.json 이 생기는지 확인
-
-**미리 제공된 것** (읽기만 하면 됩니다): `core/` 전체(설정, 프롬프트, Jev 판정, 출력 형식), `tools/mcp_servers.py`, `tools/cover_image.py`, `tools/handoff.py`의 request_research, `graph/nodes.py`의 planner·synthesizer·writer·publisher, `main.py`
